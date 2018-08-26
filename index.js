@@ -32,10 +32,44 @@ app.get('/tasks', (request, response) => {
     response.send(tasks);
 });
 
-getTask = (request) => {
+app.put('/tasks/:taskId', (request, response) => {
+
+    const task = tasks.filter( t => t.id === request.params.taskId);
+
+    if (task) {
+        const taskUpdated = getTask(request, request.params.taskId);        
+        const indexToUpdate = tasks.findIndex( t => t.id === request.params.taskId);
+
+        tasks.splice(indexToUpdate, 1, taskUpdated);
+        response.status(200);
+        response.send(taskUpdated);
+        return;
+    }
+
+    response.status(404);
+    response.send();
+});
+
+app.delete('/tasks/:taskId', (request, response) => {
+
+    let indexToDelete = tasks.findIndex( t => t.id == request.params.taskId);
+
+    if (indexToDelete != -1) {
+        tasks.splice(indexToDelete, 1);
+
+        response.status(200);
+        response.send()
+        return;
+    }
+
+    response.status(404);
+    response.send();
+});
+
+getTask = (request, taskId) => {
     const { body } = request;
     const task = {
-        id: Math.random().toString().replace('0.', ''),
+        id: taskId ? taskId : Math.random().toString().replace('0.', ''),
         title: body.title,
         resume: body.resume,
         isDone: body.isDone,
